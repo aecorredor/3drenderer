@@ -1,3 +1,4 @@
 binary*
 compile_commands.json
 .DS_Store
+.cache

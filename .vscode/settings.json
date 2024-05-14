@@ -1,6 +1,18 @@
 {
+  "C_Cpp.errorSquiggles": "enabled",
+  "C_Cpp.formatting": "default",
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "clangd.path": "/usr/bin/clangd",
+  "clangd.arguments": [
+    "-log=verbose",
+    "-pretty",
+    "--background-index",
+    "--compile-commands-dir=${workspaceFolder}"
+  ],
+  "editor.formatOnSave": true,
   "files.associations": {
     "stdbool.h": "c",
-    "sdl.h": "c"
+    "sdl.h": "c",
+    "stdint.h": "c"
   }
 }
