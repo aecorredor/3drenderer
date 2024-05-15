@@ -6,7 +6,6 @@
         "defines": [],
         "compilerPath": "/usr/bin/clang",
         "cStandard": "c99",
-        "intelliSenseMode": "macos-clang-arm64",
         "configurationProvider": "ms-vscode.makefile-tools"
       }
     ],

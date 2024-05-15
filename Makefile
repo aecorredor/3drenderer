@@ -1,6 +1,9 @@
+CPPFLAGS := -I/$(shell brew --prefix)/include
+LDFLAGS := -L/$(shell brew --prefix)/lib
+
 COMPILER = clang
 CFILES = src/**.c
-SOURCE_LIBS = -I/opt/homebrew/include -L/opt/homebrew/lib -lSDL2
+SOURCE_LIBS = $(CPPFLAGS) $(LDFLAGS) -lSDL2
 WARNINGS = -Wall
 BUILD = -g -v -o "binary" -std=c99
 
