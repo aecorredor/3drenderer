@@ -3,6 +3,7 @@ LDFLAGS := -L/$(shell brew --prefix)/lib
 
 COMPILER = clang
 CFILES = src/**.c
+ARCH = -arch x86_64
 SOURCE_LIBS = $(CPPFLAGS) $(LDFLAGS) -lSDL2
 WARNINGS = -Wall
 BUILD = -g -v -o "binary" -std=c99
@@ -11,7 +12,7 @@ BUILD = -g -v -o "binary" -std=c99
 export ASAN_OPTIONS := allocator_may_return_null=1
 
 build:
-	$(COMPILER) $(CFILES) $(SOURCE_LIBS) $(WARNINGS) $(BUILD)
+	$(COMPILER) $(CFILES) $(ARCH) $(SOURCE_LIBS) $(WARNINGS) $(BUILD)
 	./binary
 
 clean:
