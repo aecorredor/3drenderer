@@ -12,6 +12,8 @@ export ASAN_OPTIONS := allocator_may_return_null=1
 
 build:
 	$(COMPILER) $(CFILES) $(SOURCE_LIBS) $(WARNINGS) $(BUILD)
+
+run:
 	./binary
 
 clean:
