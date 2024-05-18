@@ -39,6 +39,12 @@ bool initialize_window(void) {
   return true;
 }
 
+void draw_pixel(int x, int y, uint32_t color) {
+  if (x >= 0 && x < window_width && y >= 0 && y < window_height) {
+    color_buffer[(window_width * y) + x] = color;
+  }
+}
+
 void render_color_buffer(void) {
   SDL_UpdateTexture(color_buffer_texture, NULL, color_buffer,
                     (int)(window_width * sizeof(uint32_t)));
@@ -53,7 +59,7 @@ void clear_color_buffer(uint32_t color) {
       // 0 0 0 0
       // --
       // 0 0 0 0  0 0 0 0
-      color_buffer[(window_width * y) + x] = color;
+      draw_pixel(x, y, color);
     }
   }
 }
@@ -68,7 +74,7 @@ void destroy_window(void) {
 void draw_grid(void) {
   for (int y = 0; y < window_height; y += 10) {
     for (int x = 0; x < window_width; x += 10) {
-      color_buffer[(window_width * y) + x] = 0xFF333333;
+      draw_pixel(x, y, 0xFF333333);
     }
   }
 }
