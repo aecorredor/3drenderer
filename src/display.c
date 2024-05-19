@@ -34,7 +34,7 @@ bool initialize_window(void) {
     return false;
   }
 
-  SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+  // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 
   return true;
 }
