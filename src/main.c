@@ -1,3 +1,4 @@
+#include "array.h"
 #include "display.h"
 #include "mesh.h"
 #include "triangle.h"
@@ -10,7 +11,7 @@ const int CUBE_POINT_COUNT = 9 * 9 * 9;
 vec3_t camera_position = {.x = 0, .y = 0, .z = -5};
 vec3_t cube_rotation = {.x = 0, .y = 0, .z = 0};
 
-triangle_t triangles_to_render[MESH_FACE_COUNT];
+triangle_t *triangles_to_render = NULL;
 
 float fov_factor = 640;
 
@@ -54,6 +55,8 @@ void update(void) {
 
   previous_frame_time = SDL_GetTicks();
 
+  triangles_to_render = NULL;
+
   cube_rotation.x += 0.01;
   cube_rotation.y += 0.01;
   cube_rotation.z += 0.01;
@@ -90,7 +93,7 @@ void update(void) {
     }
 
     // Save the projected triangle in the array of triangles to render.
-    triangles_to_render[i] = projected_triangle;
+    array_push(triangles_to_render, projected_triangle)
   }
 }
 
@@ -98,7 +101,8 @@ void render(void) {
   draw_grid();
 
   // Loop all the projected triangles and render them.
-  for (int i = 0; i < MESH_FACE_COUNT; i++) {
+  int mesh_face_count = array_length(triangles_to_render);
+  for (int i = 0; i < mesh_face_count; i++) {
     triangle_t triangle = triangles_to_render[i];
     // Draw all vertices of the triangle.
     draw_rect(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
@@ -110,6 +114,7 @@ void render(void) {
                   0xFFFFFF00);
   }
 
+  array_free(triangles_to_render);
   render_color_buffer();
   clear_color_buffer(0xFF000000);
 
