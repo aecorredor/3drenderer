@@ -1,13 +1,21 @@
 #include "mesh.h"
+#include "array.h"
+#include <stdio.h>
 
-vec3_t mesh_vertices[MESH_VERTICES_COUNT] = {
+mesh_t mesh = {
+    .vertices = NULL,
+    .faces = NULL,
+    .rotation = {0, 0, 0},
+};
+
+vec3_t cube_vertices[CUBE_VERTICES_COUNT] = {
     {.x = -1, .y = -1, .z = -1}, {.x = -1, .y = 1, .z = -1},
     {.x = 1, .y = 1, .z = -1},   {.x = 1, .y = -1, .z = -1},
     {.x = 1, .y = 1, .z = 1},    {.x = 1, .y = -1, .z = 1},
     {.x = -1, .y = 1, .z = 1},   {.x = -1, .y = -1, .z = 1},
 };
 
-face_t mesh_faces[MESH_FACE_COUNT] = {
+face_t cube_faces[CUBE_FACE_COUNT] = {
     // front
     {.a = 1, .b = 2, .c = 3},
     {.a = 1, .b = 3, .c = 4},
@@ -27,3 +35,13 @@ face_t mesh_faces[MESH_FACE_COUNT] = {
     {.a = 6, .b = 8, .c = 1},
     {.a = 6, .b = 1, .c = 4},
 };
+
+void load_cube_mesh(void) {
+  for (int i = 0; i < CUBE_VERTICES_COUNT; i++) {
+    array_push(mesh.vertices, cube_vertices[i]);
+  }
+
+  for (int i = 0; i < CUBE_FACE_COUNT; i++) {
+    array_push(mesh.faces, cube_faces[i]);
+  }
+}
