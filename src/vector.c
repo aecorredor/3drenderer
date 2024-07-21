@@ -43,6 +43,8 @@ vec2_t vec2_div(vec2_t a, float factor) {
   return result;
 }
 
+float vec2_dot(vec2_t a, vec2_t b) { return (a.x * b.x) + (a.y * b.y); }
+
 //--------------------------------------
 // 3D
 //--------------------------------------
@@ -95,6 +97,10 @@ vec3_t vec3_cross(vec3_t a, vec3_t b) {
                    .z = a.x * b.y - a.y * b.x};
 
   return result;
+}
+
+float vec3_dot(vec3_t a, vec3_t b) {
+  return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
 vec3_t vec3_rotate_x(vec3_t v, float angle) {
