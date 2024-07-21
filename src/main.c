@@ -7,7 +7,7 @@
 
 bool is_running = false;
 
-vec3_t camera_position = {.x = 0, .y = 0, .z = -5};
+vec3_t camera_position = {.x = 0, .y = 0, .z = 0};
 
 triangle_t *triangles_to_render = NULL;
 
@@ -21,8 +21,7 @@ void setup(void) {
   color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
                                            SDL_TEXTUREACCESS_STREAMING,
                                            window_width, window_height);
-  // load_cube_mesh();
-  load_obj_file_data("./src/assets/f22.obj");
+  load_obj_file_data("./src/assets/cube.obj");
 }
 
 void process_input(void) {
@@ -44,6 +43,31 @@ vec2_t project(vec3_t point) {
   vec2_t projected_point = {.x = (fov_factor * point.x) / point.z,
                             .y = (fov_factor * point.y) / point.z};
   return projected_point;
+}
+
+bool should_backface_cull(vec3_t transformed_vertices[3]) {
+  vec3_t vector_a = transformed_vertices[0]; /*      A    */
+  vec3_t vector_b = transformed_vertices[1]; /*    /  \   */
+  vec3_t vector_c = transformed_vertices[2]; /*   C -- B  */
+
+  // Get the vectors of two sides of the triangle pointing
+  // to the camera.
+  vec3_t vector_ab = vec3_sub(vector_b, vector_a);
+  vec3_t vector_ac = vec3_sub(vector_c, vector_a);
+
+  // Compute the face normal, which is just the cross product
+  // to find perpendicular vector - left handed coordinate system.
+  vec3_t normal = vec3_cross(vector_ab, vector_ac);
+
+  // Find the vector between a point in the triangle (face) and the
+  // camera origin.
+  vec3_t camera_ray = vec3_sub(camera_position, vector_a);
+
+  // Calculate how aligned the camera ray is with the face normal.
+  // (using dot product).
+  float face_camera_alignment = vec3_dot(normal, camera_ray);
+
+  return face_camera_alignment < 0;
 }
 
 void update(void) {
@@ -83,12 +107,15 @@ void update(void) {
       transformed_vertex = vec3_rotate_z(transformed_vertex, mesh.rotation.z);
 
       // Translate vertex away from the camera.
-      transformed_vertex.z -= camera_position.z;
+      transformed_vertex.z += 5;
 
       transformed_vertices[j] = transformed_vertex;
     }
 
-    // TODO: check backface culling.
+    if (should_backface_cull(transformed_vertices)) {
+      // Skip rendering the face.
+      continue;
+    }
 
     for (int j = 0; j < 3; j++) {
       vec2_t projected_point = project(transformed_vertices[j]);
