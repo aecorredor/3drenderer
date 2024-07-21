@@ -74,6 +74,8 @@ void update(void) {
 
     triangle_t projected_triangle;
 
+    vec3_t transformed_vertices[3];
+
     for (int j = 0; j < 3; j++) {
       vec3_t transformed_vertex = face_vertices[j];
       transformed_vertex = vec3_rotate_x(transformed_vertex, mesh.rotation.x);
@@ -83,7 +85,13 @@ void update(void) {
       // Translate vertex away from the camera.
       transformed_vertex.z -= camera_position.z;
 
-      vec2_t projected_point = project(transformed_vertex);
+      transformed_vertices[j] = transformed_vertex;
+    }
+
+    // TODO: check backface culling.
+
+    for (int j = 0; j < 3; j++) {
+      vec2_t projected_point = project(transformed_vertices[j]);
 
       // Scale and translate projected points to the middle of the screen.
       projected_point.x += (window_width / 2.0f);
