@@ -54,10 +54,13 @@ bool should_backface_cull(vec3_t transformed_vertices[3]) {
   // to the camera.
   vec3_t vector_ab = vec3_sub(vector_b, vector_a);
   vec3_t vector_ac = vec3_sub(vector_c, vector_a);
+  vec3_normalize(&vector_ab);
+  vec3_normalize(&vector_ac);
 
   // Compute the face normal, which is just the cross product
   // to find perpendicular vector - left handed coordinate system.
   vec3_t normal = vec3_cross(vector_ab, vector_ac);
+  vec3_normalize(&normal);
 
   // Find the vector between a point in the triangle (face) and the
   // camera origin.

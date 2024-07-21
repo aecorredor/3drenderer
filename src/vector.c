@@ -45,6 +45,13 @@ vec2_t vec2_div(vec2_t a, float factor) {
 
 float vec2_dot(vec2_t a, vec2_t b) { return (a.x * b.x) + (a.y * b.y); }
 
+void vec2_normalize(vec2_t *a) {
+  float length = sqrt(a->x * a->x + a->y * a->y);
+
+  a->x /= length;
+  a->y /= length;
+}
+
 //--------------------------------------
 // 3D
 //--------------------------------------
@@ -101,6 +108,13 @@ vec3_t vec3_cross(vec3_t a, vec3_t b) {
 
 float vec3_dot(vec3_t a, vec3_t b) {
   return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+}
+
+void vec3_normalize(vec3_t *a) {
+  float length = sqrt(a->x * a->x + a->y * a->y + a->z * a->z);
+  a->x /= length;
+  a->y /= length;
+  a->z /= length;
 }
 
 vec3_t vec3_rotate_x(vec3_t v, float angle) {
