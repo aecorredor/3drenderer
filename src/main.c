@@ -152,7 +152,11 @@ void render(void) {
   //                 0xFFFFFF00);
   // }
 
-  draw_filled_triangle(300, 100, 50, 400, 500, 700, 0xFF00FF00);
+  vec2_t p0 = {.x = 300, .y = 100};
+  vec2_t p1 = {.x = 50, .y = 400};
+  vec2_t p2 = {.x = 500, .y = 700};
+
+  draw_filled_triangle(p0, p1, p2, 0xFF00FF00);
 
   array_free(triangles_to_render);
   render_color_buffer();
