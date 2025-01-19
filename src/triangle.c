@@ -112,16 +112,20 @@ void draw_filled_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
 
   if (p1.y == p2.y) {
     fill_flat_bot_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
-  } else if (p0.y == p1.y) {
-    fill_flat_top_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
-  } else {
-    // Calculate thew new vertex (mx, my) using triangle similarity
-    float my = p1.y;
-    float mx = (((p2.x - p0.x) * (p1.y - p0.y)) / (p2.y - p0.y)) + p0.x;
-
-    vec2_t m = {.x = mx, .y = my};
-
-    fill_flat_bot_triangle(p0.x, p0.y, p1.x, p1.y, m.x, m.y, color);
-    fill_flat_top_triangle(p1.x, p1.y, m.x, m.y, p2.x, p2.y, color);
+    return;
   }
+
+  if (p0.y == p1.y) {
+    fill_flat_top_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
+    return;
+  }
+
+  // Calculate thew new vertex (mx, my) using triangle similarity
+  float my = p1.y;
+  float mx = (((p2.x - p0.x) * (p1.y - p0.y)) / (p2.y - p0.y)) + p0.x;
+
+  vec2_t m = {.x = mx, .y = my};
+
+  fill_flat_bot_triangle(p0.x, p0.y, p1.x, p1.y, m.x, m.y, color);
+  fill_flat_top_triangle(p1.x, p1.y, m.x, m.y, p2.x, p2.y, color);
 }
