@@ -148,8 +148,8 @@ void render(void) {
     draw_rect(triangle.points[0], 3, 3, 0xFFFFFF);
     draw_rect(triangle.points[1], 3, 3, 0xFFFFFF);
     draw_rect(triangle.points[2], 3, 3, 0xFFFFFF);
-    // draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
-    //               0xFFFFFF);
+    draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
+                  0xFFFFFF);
   }
 
   array_free(triangles_to_render);
