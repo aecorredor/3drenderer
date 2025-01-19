@@ -23,7 +23,7 @@ void clear_color_buffer(uint32_t color);
 void destroy_window(void);
 void draw_grid(void);
 void draw_line(vec2_t p0, vec2_t p1, uint32_t color);
-void draw_rect(int xPos, int yPos, int width, int height, uint32_t color);
+void draw_rect(vec2_t p, int width, int height, uint32_t color);
 void draw_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color);
 
 #endif
