@@ -139,24 +139,19 @@ void render(void) {
   draw_grid();
 
   // Loop all the projected triangles and render them.
-  // int mesh_face_count = array_length(triangles_to_render);
-  // for (int i = 0; i < mesh_face_count; i++) {
-  //   triangle_t triangle = triangles_to_render[i];
-  //   // Draw all vertices of the triangle.
-  //   draw_rect(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
-  //   draw_rect(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFFFF00);
-  //   draw_rect(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFFFF00);
-
-  //   // Draw line between vertices.
-  //   draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
-  //                 0xFFFFFF00);
-  // }
-
-  vec2_t p0 = {.x = 300, .y = 100};
-  vec2_t p1 = {.x = 50, .y = 400};
-  vec2_t p2 = {.x = 500, .y = 700};
-
-  draw_filled_triangle(p0, p1, p2, 0xFF00FF00);
+  int mesh_face_count = array_length(triangles_to_render);
+  for (int i = 0; i < mesh_face_count; i++) {
+    triangle_t triangle = triangles_to_render[i];
+    draw_filled_triangle(triangle.points[0], triangle.points[1],
+                         triangle.points[2], 0xFF00FF00);
+    // // Draw all vertices of the triangle.
+    // draw_rect(triangle.points[0], 3, 3, 0xFFFFFF);
+    // draw_rect(triangle.points[1], 3, 3, 0xFFFFFF);
+    // draw_rect(triangle.points[2], 3, 3, 0xFFFFFF);
+    // // Draw line between vertices.
+    // draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
+    //               0xFFFFFF);
+  }
 
   array_free(triangles_to_render);
   render_color_buffer();
