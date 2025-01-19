@@ -143,14 +143,13 @@ void render(void) {
   for (int i = 0; i < mesh_face_count; i++) {
     triangle_t triangle = triangles_to_render[i];
     draw_filled_triangle(triangle.points[0], triangle.points[1],
-                         triangle.points[2], 0xFF00FF00);
+                         triangle.points[2], 0x55555555);
     // // Draw all vertices of the triangle.
-    // draw_rect(triangle.points[0], 3, 3, 0xFFFFFF);
-    // draw_rect(triangle.points[1], 3, 3, 0xFFFFFF);
-    // draw_rect(triangle.points[2], 3, 3, 0xFFFFFF);
-    // // Draw line between vertices.
-    // draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
-    //               0xFFFFFF);
+    draw_rect(triangle.points[0], 3, 3, 0xFFFFFF);
+    draw_rect(triangle.points[1], 3, 3, 0xFFFFFF);
+    draw_rect(triangle.points[2], 3, 3, 0xFFFFFF);
+    draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
+                  0xFFFFFF);
   }
 
   array_free(triangles_to_render);

@@ -88,7 +88,8 @@ void draw_rect(vec2_t p, int width, int height, uint32_t color) {
   }
 }
 
-void draw_line(vec2_t p0, vec2_t p1, uint32_t color) {
+// This was the original course method - small gaps were visible.
+void _draw_line(vec2_t p0, vec2_t p1, uint32_t color) {
   int delta_x = p1.x - p0.x;
   int delta_y = p1.y - p0.y;
 
@@ -101,10 +102,43 @@ void draw_line(vec2_t p0, vec2_t p1, uint32_t color) {
   float current_x = p0.x;
   float current_y = p0.y;
 
-  for (int i = 0; i < longest_side_length; i++) {
+  for (int i = 0; i <= longest_side_length; i++) {
     draw_pixel(round(current_x), round(current_y), color);
     current_x += x_inc;
     current_y += y_inc;
+  }
+}
+
+// Bresenham's line algorithm - guarantees no gaps.
+void draw_line(vec2_t p0, vec2_t p1, uint32_t color) {
+  int x0 = round(p0.x);
+  int y0 = round(p0.y);
+  int x1 = round(p1.x);
+  int y1 = round(p1.y);
+
+  int dx = abs(x1 - x0);
+  int dy = abs(y1 - y0);
+  int sx = x0 < x1 ? 1 : -1;
+  int sy = y0 < y1 ? 1 : -1;
+  int err = (dx > dy ? dx : -dy) / 2;
+  int e2;
+
+  while (true) {
+    draw_pixel(x0, y0, color);
+
+    if (x0 == x1 && y0 == y1) {
+      break;
+    }
+
+    e2 = err;
+    if (e2 > -dx) {
+      err -= dy;
+      x0 += sx;
+    }
+    if (e2 < dy) {
+      err += dx;
+      y0 += sy;
+    }
   }
 }
 

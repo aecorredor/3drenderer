@@ -1,8 +1,8 @@
 #include "triangle.h"
 #include "display.h"
 
-void float_swap(float *a, float *b) {
-  float temp = *a;
+void vec2_swap(vec2_t *a, vec2_t *b) {
+  vec2_t temp = *a;
   *a = *b;
   *b = temp;
 }
@@ -20,16 +20,17 @@ void float_swap(float *a, float *b) {
 //  (x1,y1)------(x2,y2)
 //
 ///////////////////////////////////////////////////////////////////////////////
-void fill_flat_bot_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
+void fill_flat_bot_triangle(int x0, int y0, int x1, int y1, int x2, int y2,
+                            uint32_t color) {
   // Find the two slopes (two triangle legs)
-  float inv_slope_1 = (float)(p1.x - p0.x) / (p1.y - p0.y);
-  float inv_slope_2 = (float)(p2.x - p0.x) / (p2.y - p0.y);
+  float inv_slope_1 = (float)(x1 - x0) / (y1 - y0);
+  float inv_slope_2 = (float)(x2 - x0) / (y2 - y0);
 
-  float x_start = p0.x;
-  float x_end = p0.x;
+  float x_start = x0;
+  float x_end = x0;
 
   // Loop all scanlines from top to bottom
-  for (int y = p0.y; y <= p2.y; y++) {
+  for (int y = y0; y <= y2; y++) {
     vec2_t start = {.x = x_start, .y = y};
     vec2_t end = {.x = x_end, .y = y};
     draw_line(start, end, color);
@@ -52,16 +53,17 @@ void fill_flat_bot_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
 //        (x2,y2)
 //
 ///////////////////////////////////////////////////////////////////////////////
-void fill_flat_top_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
+void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2,
+                            uint32_t color) {
   // Find the two slopes (two triangle legs)
-  float inv_slope_1 = (float)(p2.x - p0.x) / (p2.y - p0.y);
-  float inv_slope_2 = (float)(p2.x - p1.x) / (p2.y - p1.y);
+  float inv_slope_1 = (float)(x2 - x0) / (y2 - y0);
+  float inv_slope_2 = (float)(x2 - x1) / (y2 - y1);
 
-  float x_start = p2.x;
-  float x_end = p2.x;
+  float x_start = x2;
+  float x_end = x2;
 
-  // Loop all scanlines from top to bottom
-  for (int y = p2.y; y >= p0.y; y--) {
+  // Loop all scanlines from bottom to top
+  for (int y = y2; y >= y0; y--) {
     vec2_t start = {.x = x_start, .y = y};
     vec2_t end = {.x = x_end, .y = y};
     draw_line(start, end, color);
@@ -97,24 +99,21 @@ void fill_flat_top_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
 void draw_filled_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
   // We need to sort vertices by ascending y-coordinate (y0 < y1 < y2)
   if (p0.y > p1.y) {
-    float_swap(&p0.y, &p1.y);
-    float_swap(&p0.x, &p1.x);
+    vec2_swap(&p0, &p1);
   }
 
   if (p1.y > p2.y) {
-    float_swap(&p1.y, &p2.y);
-    float_swap(&p1.x, &p2.x);
+    vec2_swap(&p1, &p2);
   }
 
   if (p0.y > p1.y) {
-    float_swap(&p0.y, &p1.y);
-    float_swap(&p0.x, &p1.x);
+    vec2_swap(&p0, &p1);
   }
 
   if (p1.y == p2.y) {
-    fill_flat_bot_triangle(p0, p1, p2, color);
+    fill_flat_bot_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
   } else if (p0.y == p1.y) {
-    fill_flat_top_triangle(p0, p1, p2, color);
+    fill_flat_top_triangle(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, color);
   } else {
     // Calculate thew new vertex (mx, my) using triangle similarity
     float my = p1.y;
@@ -122,7 +121,7 @@ void draw_filled_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
 
     vec2_t m = {.x = mx, .y = my};
 
-    fill_flat_bot_triangle(p0, p1, m, color);
-    fill_flat_top_triangle(p1, m, p2, color);
+    fill_flat_bot_triangle(p0.x, p0.y, p1.x, p1.y, m.x, m.y, color);
+    fill_flat_top_triangle(p1.x, p1.y, m.x, m.y, p2.x, p2.y, color);
   }
 }
