@@ -27,7 +27,22 @@ void fill_flat_bot_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
 }
 
 void fill_flat_top_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
-  // TODO: implement
+  // Find the two slopes (two triangle legs)
+  float inv_slope_1 = (float)(p2.x - p0.x) / (p2.y - p0.y);
+  float inv_slope_2 = (float)(p2.x - p1.x) / (p2.y - p1.y);
+
+  float x_start = p2.x;
+  float x_end = p2.x;
+
+  // Loop all scanlines from top to bottom
+  for (int y = p2.y; y >= p0.y; y--) {
+    vec2_t start = {.x = x_start, .y = y};
+    vec2_t end = {.x = x_end, .y = y};
+    draw_line(start, end, color);
+
+    x_start -= inv_slope_1;
+    x_end -= inv_slope_2;
+  }
 }
 
 void draw_filled_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
