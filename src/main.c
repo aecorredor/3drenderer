@@ -21,7 +21,8 @@ void setup(void) {
   color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
                                            SDL_TEXTUREACCESS_STREAMING,
                                            window_width, window_height);
-  load_obj_file_data("./src/assets/cube.obj");
+  // load_obj_file_data("./src/assets/cube.obj");
+  load_cube_mesh();
 }
 
 void process_input(void) {
@@ -153,11 +154,50 @@ void update(void) {
       projected_point.y += (window_height / 2.0f);
 
       projected_triangle.points[j] = projected_point;
+      projected_triangle.color = mesh_face.color;
       projected_triangle.avg_depth = avg_depth;
     }
 
     // Save the projected triangle in the array of triangles to render.
-    array_push(triangles_to_render, projected_triangle)
+    array_push(triangles_to_render, projected_triangle);
+  }
+
+  // Simple bubble sort:
+  //  Initial array: [2️⃣, 5️⃣, 1️⃣, 4️⃣]
+
+  // Step-by-step sorting:
+
+  // i=0:
+  //   j=0: [2️⃣, 5️⃣, 1️⃣, 4️⃣] Compare 2-2 (i with i): No swap
+  //   j=1: [2️⃣, 5️⃣, 1️⃣, 4️⃣] Compare 2-5 (i with j): Swap! ➡️ [5️⃣, 2️⃣, 1️⃣, 4️⃣]
+  //   j=2: [5️⃣, 2️⃣, 1️⃣, 4️⃣] Compare 5-1 (i with j): No swap
+  //   j=3: [5️⃣, 2️⃣, 1️⃣, 4️⃣] Compare 5-4 (i with j): No swap
+
+  // i=1:
+  //   j=1: [5️⃣, 2️⃣, 1️⃣, 4️⃣] Compare 2-2 (i with i): No swap
+  //   j=2: [5️⃣, 2️⃣, 1️⃣, 4️⃣] Compare 2-1 (i with j): No swap
+  //   j=3: [5️⃣, 2️⃣, 1️⃣, 4️⃣] Compare 2-4 (i with j): Swap! ➡️ [5️⃣, 4️⃣, 1️⃣, 2️⃣]
+
+  // i=2:
+  //   j=2: [5️⃣, 4️⃣, 1️⃣, 2️⃣] Compare 1-1 (i with i): No swap
+  //   j=3: [5️⃣, 4️⃣, 1️⃣, 2️⃣] Compare 1-2 (i with j): Swap! ➡️ [5️⃣, 4️⃣, 2️⃣, 1️⃣]
+
+  // i=3:
+  //   j=3: [5️⃣, 4️⃣, 2️⃣, 1️⃣] Compare 1-1 (i with i): No swap
+
+  // Final sorted array: [5️⃣, 4️⃣, 2️⃣, 1️⃣]
+  int mesh_face_count = array_length(triangles_to_render);
+  for (int i = 0; i < mesh_face_count; i++) {
+    for (int j = i; j < mesh_face_count; j++) {
+      triangle_t curr = triangles_to_render[i];
+      triangle_t next = triangles_to_render[j];
+
+      // Higher depth go first so they are rendered in the back.
+      if (curr.avg_depth < next.avg_depth) {
+        triangles_to_render[i] = next;
+        triangles_to_render[j] = curr;
+      }
+    }
   }
 }
 
@@ -166,6 +206,7 @@ void render(void) {
 
   // Loop all the projected triangles and render them.
   int mesh_face_count = array_length(triangles_to_render);
+
   for (int i = 0; i < mesh_face_count; i++) {
     triangle_t triangle = triangles_to_render[i];
 
@@ -184,11 +225,11 @@ void render(void) {
       break;
     case RENDER_FILL_TRIANGLE:
       draw_filled_triangle(triangle.points[0], triangle.points[1],
-                           triangle.points[2], 0x55555555);
+                           triangle.points[2], triangle.color);
       break;
     case RENDER_FILL_TRIANGLE_WIRE:
       draw_filled_triangle(triangle.points[0], triangle.points[1],
-                           triangle.points[2], 0x55555555);
+                           triangle.points[2], triangle.color);
       draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
                     0xFFFFFF);
       break;
