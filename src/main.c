@@ -141,6 +141,10 @@ void update(void) {
       continue;
     }
 
+    float avg_depth = (transformed_vertices[0].z + transformed_vertices[1].z +
+                       transformed_vertices[2].z) /
+                      3.0;
+
     for (int j = 0; j < 3; j++) {
       vec2_t projected_point = project(transformed_vertices[j]);
 
@@ -149,6 +153,7 @@ void update(void) {
       projected_point.y += (window_height / 2.0f);
 
       projected_triangle.points[j] = projected_point;
+      projected_triangle.avg_depth = avg_depth;
     }
 
     // Save the projected triangle in the array of triangles to render.
