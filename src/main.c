@@ -33,9 +33,29 @@ void process_input(void) {
     is_running = false;
     break;
   case SDL_KEYDOWN:
-    if (event.key.keysym.sym == SDLK_ESCAPE)
+    switch (event.key.keysym.sym) {
+    case SDLK_ESCAPE:
       is_running = false;
-    break;
+      break;
+    case SDLK_1:
+      render_method = RENDER_WIRE_VERTEX;
+      break;
+    case SDLK_2:
+      render_method = RENDER_WIRE;
+      break;
+    case SDLK_3:
+      render_method = RENDER_FILL_TRIANGLE;
+      break;
+    case SDLK_4:
+      render_method = RENDER_FILL_TRIANGLE_WIRE;
+      break;
+    case SDLK_c:
+      cull_method = CULL_BACKFACE;
+      break;
+    case SDLK_d:
+      cull_method = CULL_NONE;
+      break;
+    }
   }
 }
 
@@ -115,7 +135,8 @@ void update(void) {
       transformed_vertices[j] = transformed_vertex;
     }
 
-    if (should_backface_cull(transformed_vertices)) {
+    if (cull_method == CULL_BACKFACE &&
+        should_backface_cull(transformed_vertices)) {
       // Skip rendering the face.
       continue;
     }
@@ -142,14 +163,31 @@ void render(void) {
   int mesh_face_count = array_length(triangles_to_render);
   for (int i = 0; i < mesh_face_count; i++) {
     triangle_t triangle = triangles_to_render[i];
-    draw_filled_triangle(triangle.points[0], triangle.points[1],
-                         triangle.points[2], 0x55555555);
-    // // Draw all vertices of the triangle.
-    draw_rect(triangle.points[0], 3, 3, 0xFFFFFF);
-    draw_rect(triangle.points[1], 3, 3, 0xFFFFFF);
-    draw_rect(triangle.points[2], 3, 3, 0xFFFFFF);
-    draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
-                  0xFFFFFF);
+
+    switch (render_method) {
+    case RENDER_WIRE_VERTEX:
+      // Draw all vertices of the triangle.
+      draw_rect(triangle.points[0], 3, 3, 0xFFFFFF);
+      draw_rect(triangle.points[1], 3, 3, 0xFFFFFF);
+      draw_rect(triangle.points[2], 3, 3, 0xFFFFFF);
+      draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
+                    0xFFFFFF);
+      break;
+    case RENDER_WIRE:
+      draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
+                    0xFFFFFF);
+      break;
+    case RENDER_FILL_TRIANGLE:
+      draw_filled_triangle(triangle.points[0], triangle.points[1],
+                           triangle.points[2], 0x55555555);
+      break;
+    case RENDER_FILL_TRIANGLE_WIRE:
+      draw_filled_triangle(triangle.points[0], triangle.points[1],
+                           triangle.points[2], 0x55555555);
+      draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
+                    0xFFFFFF);
+      break;
+    }
   }
 
   array_free(triangles_to_render);
@@ -165,6 +203,9 @@ void free_resources(void) {
 }
 
 int main(void) {
+  render_method = RENDER_WIRE;
+  cull_method = CULL_BACKFACE;
+
   is_running = initialize_window();
 
   setup();

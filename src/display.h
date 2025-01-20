@@ -16,6 +16,18 @@ extern uint32_t *color_buffer;
 extern int window_width;
 extern int window_height;
 
+enum cull_method {
+  CULL_NONE,
+  CULL_BACKFACE,
+} cull_method;
+
+enum render_method {
+  RENDER_WIRE,
+  RENDER_WIRE_VERTEX,
+  RENDER_FILL_TRIANGLE,
+  RENDER_FILL_TRIANGLE_WIRE,
+} render_method;
+
 bool initialize_window(void);
 void draw_pixel(int x, int y, uint32_t color);
 void render_color_buffer(void);
