@@ -1,5 +1,6 @@
 #include "array.h"
 #include "display.h"
+#include "matrix.h"
 #include "mesh.h"
 #include "triangle.h"
 #include "vector.h"
@@ -66,10 +67,10 @@ vec2_t project(vec3_t point) {
   return projected_point;
 }
 
-bool should_backface_cull(vec3_t transformed_vertices[3]) {
-  vec3_t vector_a = transformed_vertices[0]; /*      A    */
-  vec3_t vector_b = transformed_vertices[1]; /*    /  \   */
-  vec3_t vector_c = transformed_vertices[2]; /*   C -- B  */
+bool should_backface_cull(vec4_t transformed_vertices[3]) {
+  vec3_t vector_a = vec3_from_vec4(transformed_vertices[0]); /*      A    */
+  vec3_t vector_b = vec3_from_vec4(transformed_vertices[1]); /*    /  \   */
+  vec3_t vector_c = vec3_from_vec4(transformed_vertices[2]); /*   C -- B  */
 
   // Get the vectors of two sides of the triangle pointing
   // to the camera.
@@ -108,6 +109,8 @@ void update(void) {
   mesh.rotation.x += 0.01;
   mesh.rotation.y += 0.01;
   mesh.rotation.z += 0.01;
+  mesh.scale.x += 0.02;
+  mesh.scale.y += 0.01;
 
   // Loop all triangle faces of our mesh.
   for (int i = 0; i < array_length(mesh.faces); i++) {
@@ -122,13 +125,13 @@ void update(void) {
 
     triangle_t projected_triangle;
 
-    vec3_t transformed_vertices[3];
+    mat4_t scale_matrix =
+        mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+    vec4_t transformed_vertices[3];
 
     for (int j = 0; j < 3; j++) {
-      vec3_t transformed_vertex = face_vertices[j];
-      transformed_vertex = vec3_rotate_x(transformed_vertex, mesh.rotation.x);
-      transformed_vertex = vec3_rotate_y(transformed_vertex, mesh.rotation.y);
-      transformed_vertex = vec3_rotate_z(transformed_vertex, mesh.rotation.z);
+      vec4_t transformed_vertex =
+          mat4_mul_vec4(scale_matrix, vec4_from_vec3(face_vertices[j]));
 
       // Translate vertex away from the camera.
       transformed_vertex.z += 5;
@@ -147,7 +150,7 @@ void update(void) {
                       3.0;
 
     for (int j = 0; j < 3; j++) {
-      vec2_t projected_point = project(transformed_vertices[j]);
+      vec2_t projected_point = project(vec3_from_vec4(transformed_vertices[j]));
 
       // Scale and translate projected points to the middle of the screen.
       projected_point.x += (window_width / 2.0f);
