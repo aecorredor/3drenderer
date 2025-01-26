@@ -113,6 +113,8 @@ void update(void) {
   // mesh.scale.x += 0.02;
   // mesh.scale.y += 0.01;
   mesh.translation.x += 0.01;
+  // Translate vertex away from the camera.
+  mesh.translation.z = 5;
 
   // Loop all triangle faces of our mesh.
   for (int i = 0; i < array_length(mesh.faces); i++) {
@@ -139,9 +141,6 @@ void update(void) {
           mat4_mul_vec4(scale_matrix, vec4_from_vec3(face_vertices[j]));
       transformed_vertex =
           mat4_mul_vec4(translation_matrix, transformed_vertex);
-
-      // Translate vertex away from the camera.
-      transformed_vertex.z += 5;
 
       transformed_vertices[j] = transformed_vertex;
     }
