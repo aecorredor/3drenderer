@@ -167,7 +167,7 @@ void update(void) {
     for (int j = 0; j < 3; j++) {
       vec2_t projected_point = project(vec3_from_vec4(transformed_vertices[j]));
 
-      // Scale and translate projected points to the middle of the screen.
+      // Move points to the middle of the screen.
       projected_point.x += (window_width / 2.0f);
       projected_point.y += (window_height / 2.0f);
 
