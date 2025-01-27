@@ -125,9 +125,6 @@ void update(void) {
     face_vertices[1] = mesh.vertices[mesh_face.b - 1];
     face_vertices[2] = mesh.vertices[mesh_face.c - 1];
 
-    // Loop all three vertices of the current face and apply
-    // transformations.
-
     triangle_t projected_triangle;
 
     mat4_t scale_matrix =
@@ -140,6 +137,8 @@ void update(void) {
 
     vec4_t transformed_vertices[3];
 
+    // Loop all three vertices of the current face and apply
+    // transformations.
     for (int j = 0; j < 3; j++) {
 
       // scale, rotate, and then translate, in that exclusive order.
