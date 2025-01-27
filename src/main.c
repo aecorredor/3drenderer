@@ -9,10 +9,9 @@
 bool is_running = false;
 
 vec3_t camera_position = {.x = 0, .y = 0, .z = 0};
+mat4_t proj_matrix;
 
 triangle_t *triangles_to_render = NULL;
-
-float fov_factor = 640;
 
 int previous_frame_time = 0;
 
@@ -22,6 +21,14 @@ void setup(void) {
   color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
                                            SDL_TEXTUREACCESS_STREAMING,
                                            window_width, window_height);
+
+  // the same as 180/3, or 60deg.
+  float fov = M_PI / 3.0;
+  float aspect = (float)window_height / window_width;
+  float znear = 0.1;
+  float zfar = 100.0;
+  proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
+
   // load_obj_file_data("./src/assets/cube.obj");
   load_cube_mesh();
 }
@@ -59,12 +66,6 @@ void process_input(void) {
       break;
     }
   }
-}
-
-vec2_t project(vec3_t point) {
-  vec2_t projected_point = {.x = (fov_factor * point.x) / point.z,
-                            .y = (fov_factor * point.y) / point.z};
-  return projected_point;
 }
 
 bool should_backface_cull(vec4_t transformed_vertices[3]) {
@@ -108,10 +109,10 @@ void update(void) {
 
   // Change the mesh scale/rotation values per animation frame.
   mesh.rotation.x += 0.01;
-  mesh.rotation.y += 0.01;
-  mesh.rotation.z += 0.01;
-  mesh.scale.x += 0.002;
-  mesh.scale.y += 0.001;
+  // mesh.rotation.y += 0.01;
+  // mesh.rotation.z += 0.01;
+  // mesh.scale.x += 0.002;
+  // mesh.scale.y += 0.001;
   mesh.translation.x += 0.01;
   // Translate vertex away from the camera.
   mesh.translation.z = 5;
@@ -165,11 +166,19 @@ void update(void) {
                       3.0;
 
     for (int j = 0; j < 3; j++) {
-      vec2_t projected_point = project(vec3_from_vec4(transformed_vertices[j]));
+      vec2_t projected_point = vec2_from_vec4(
+          mat4_mul_vec4_project(proj_matrix, transformed_vertices[j]));
 
-      // Move points to the middle of the screen.
-      projected_point.x += (window_width / 2.0f);
-      projected_point.y += (window_height / 2.0f);
+      float width_factor = window_width / 2.0;
+      float height_factor = window_height / 2.0;
+
+      // Scale into view
+      projected_point.x *= width_factor;
+      projected_point.y *= height_factor;
+
+      // Translate points to the middle of the screen.
+      projected_point.x += width_factor;
+      projected_point.y += height_factor;
 
       projected_triangle.points[j] = projected_point;
       projected_triangle.color = mesh_face.color;

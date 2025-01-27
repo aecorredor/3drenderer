@@ -52,6 +52,15 @@ void vec2_normalize(vec2_t *a) {
   a->y /= length;
 }
 
+vec2_t vec2_from_vec4(vec4_t a) {
+  vec2_t result = {
+      .x = a.x,
+      .y = a.y,
+  };
+
+  return result;
+}
+
 //--------------------------------------
 // 3D
 //--------------------------------------
