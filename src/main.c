@@ -239,9 +239,9 @@ void render(void) {
     switch (render_method) {
     case RENDER_WIRE_VERTEX:
       // Draw all vertices of the triangle.
-      draw_rect(triangle.points[0], 3, 3, 0xFF0000);
-      draw_rect(triangle.points[1], 3, 3, 0xFF0000);
-      draw_rect(triangle.points[2], 3, 3, 0xFF0000);
+      draw_rect(triangle.points[0], 6, 6, 0xFF0000);
+      draw_rect(triangle.points[1], 6, 6, 0xFF0000);
+      draw_rect(triangle.points[2], 6, 6, 0xFF0000);
       draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
                     0xFFFFFF);
       break;
