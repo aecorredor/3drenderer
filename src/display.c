@@ -81,9 +81,11 @@ void draw_grid(void) {
 }
 
 void draw_rect(vec2_t p, int width, int height, uint32_t color) {
-  for (int i = p.y; i < p.y + height; i++) {
-    for (int j = p.x; j < p.x + width; j++) {
-      color_buffer[(window_width * i) + j] = color;
+  for (int i = 0; i < width; i++) {
+    for (int j = 0; j < height; j++) {
+      int current_x = p.x + i;
+      int current_y = p.y + j;
+      draw_pixel(current_x, current_y, color);
     }
   }
 }
