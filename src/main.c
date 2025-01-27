@@ -129,9 +129,9 @@ void update(void) {
   triangles_to_render = NULL;
 
   // Change the mesh scale/rotation values per animation frame.
-  mesh.rotation.x += 0.005;
-  mesh.rotation.y += 0.005;
-  mesh.rotation.z += 0.005;
+  // mesh.rotation.x += 0.005;
+  // mesh.rotation.y += 0.005;
+  // mesh.rotation.z += 0.005;
   // mesh.scale.x += 0.002;
   // mesh.scale.y += 0.001;
   // mesh.translation.x += 0.01;
@@ -202,6 +202,9 @@ void update(void) {
       // Scale into view
       projected_point.x *= width_factor;
       projected_point.y *= height_factor;
+
+      // Account for flipped y-axis in models vs screen buffer.
+      projected_point.y *= -1;
 
       // Translate points to the middle of the screen.
       projected_point.x += width_factor;
