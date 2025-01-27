@@ -1,5 +1,6 @@
 #include "array.h"
 #include "display.h"
+#include "light.h"
 #include "matrix.h"
 #include "mesh.h"
 #include "triangle.h"
@@ -68,10 +69,20 @@ void process_input(void) {
   }
 }
 
-bool should_backface_cull(vec4_t transformed_vertices[3]) {
+void set_vec3_vertices(vec3_t *vertices, vec4_t transformed_vertices[3]) {
   vec3_t vector_a = vec3_from_vec4(transformed_vertices[0]); /*      A    */
   vec3_t vector_b = vec3_from_vec4(transformed_vertices[1]); /*    /  \   */
   vec3_t vector_c = vec3_from_vec4(transformed_vertices[2]); /*   C -- B  */
+
+  vertices[0] = vector_a;
+  vertices[1] = vector_b;
+  vertices[2] = vector_c;
+}
+
+vec3_t get_normal(vec3_t transformed_vertices[3]) {
+  vec3_t vector_a = transformed_vertices[0];
+  vec3_t vector_b = transformed_vertices[1];
+  vec3_t vector_c = transformed_vertices[2];
 
   // Get the vectors of two sides of the triangle pointing
   // to the camera.
@@ -84,6 +95,16 @@ bool should_backface_cull(vec4_t transformed_vertices[3]) {
   // to find perpendicular vector - left handed coordinate system.
   vec3_t normal = vec3_cross(vector_ab, vector_ac);
   vec3_normalize(&normal);
+
+  return normal;
+}
+
+bool should_backface_cull(vec3_t transformed_vertices[3]) {
+  vec3_t vector_a = transformed_vertices[0];
+
+  // Compute the face normal, which is just the cross product
+  // to find perpendicular vector - left handed coordinate system.
+  vec3_t normal = get_normal(transformed_vertices);
 
   // Find the vector between a point in the triangle (face) and the
   // camera origin.
@@ -108,12 +129,12 @@ void update(void) {
   triangles_to_render = NULL;
 
   // Change the mesh scale/rotation values per animation frame.
-  mesh.rotation.x += 0.01;
-  // mesh.rotation.y += 0.01;
-  // mesh.rotation.z += 0.01;
+  mesh.rotation.x += 0.005;
+  mesh.rotation.y += 0.005;
+  mesh.rotation.z += 0.005;
   // mesh.scale.x += 0.002;
   // mesh.scale.y += 0.001;
-  mesh.translation.x += 0.01;
+  // mesh.translation.x += 0.01;
   // Translate vertex away from the camera.
   mesh.translation.z = 5;
 
@@ -132,8 +153,8 @@ void update(void) {
     mat4_t translation_matrix = mat4_make_translation(
         mesh.translation.x, mesh.translation.y, mesh.translation.z);
     mat4_t rotation_matrix_x = mat4_make_rotation_x(mesh.rotation.x);
-    mat4_t rotation_matrix_y = mat4_make_rotation_x(mesh.rotation.y);
-    mat4_t rotation_matrix_z = mat4_make_rotation_x(mesh.rotation.z);
+    mat4_t rotation_matrix_y = mat4_make_rotation_y(mesh.rotation.y);
+    mat4_t rotation_matrix_z = mat4_make_rotation_z(mesh.rotation.z);
 
     vec4_t transformed_vertices[3];
 
@@ -154,8 +175,12 @@ void update(void) {
       transformed_vertices[j] = transformed_vertex;
     }
 
+    vec3_t vec3_transformed_vertices[3];
+
+    set_vec3_vertices(vec3_transformed_vertices, transformed_vertices);
+
     if (cull_method == CULL_BACKFACE &&
-        should_backface_cull(transformed_vertices)) {
+        should_backface_cull(vec3_transformed_vertices)) {
       // Skip rendering the face.
       continue;
     }
@@ -163,6 +188,9 @@ void update(void) {
     float avg_depth = (transformed_vertices[0].z + transformed_vertices[1].z +
                        transformed_vertices[2].z) /
                       3.0;
+
+    vec3_t normal = get_normal(vec3_transformed_vertices);
+    float light_intensity_factor = -vec3_dot(normal, global_light.direction);
 
     for (int j = 0; j < 3; j++) {
       vec2_t projected_point = vec2_from_vec4(
@@ -180,7 +208,8 @@ void update(void) {
       projected_point.y += height_factor;
 
       projected_triangle.points[j] = projected_point;
-      projected_triangle.color = mesh_face.color;
+      projected_triangle.color =
+          apply_light_intensity_factor(mesh_face.color, light_intensity_factor);
       projected_triangle.avg_depth = avg_depth;
     }
 
