@@ -26,6 +26,8 @@ enum render_method {
   RENDER_WIRE_VERTEX,
   RENDER_FILL_TRIANGLE,
   RENDER_FILL_TRIANGLE_WIRE,
+  RENDER_TEXTURED,
+  RENDER_TEXTURED_WIRE
 } render_method;
 
 bool initialize_window(void);
@@ -36,6 +38,5 @@ void destroy_window(void);
 void draw_grid(void);
 void draw_line(vec2_t p0, vec2_t p1, uint32_t color);
 void draw_rect(vec2_t p, int width, int height, uint32_t color);
-void draw_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color);
 
 #endif

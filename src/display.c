@@ -144,9 +144,3 @@ void _draw_line(vec2_t p0, vec2_t p1, uint32_t color) {
     }
   }
 }
-
-void draw_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
-  draw_line(p0, p1, color);
-  draw_line(p1, p2, color);
-  draw_line(p2, p0, color);
-}

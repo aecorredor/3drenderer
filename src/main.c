@@ -3,8 +3,10 @@
 #include "light.h"
 #include "matrix.h"
 #include "mesh.h"
+#include "texture.h"
 #include "triangle.h"
 #include "vector.h"
+#include <_types/_uint32_t.h>
 #include <stdio.h>
 
 bool is_running = false;
@@ -30,8 +32,10 @@ void setup(void) {
   float zfar = 100.0;
   proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
-  load_obj_file_data("./src/assets/f22.obj");
-  // load_cube_mesh();
+  mesh_texture = (uint32_t *)REDBRICK_TEXTURE;
+
+  // load_obj_file_data("./src/assets/f22.obj");
+  load_cube_mesh();
 }
 
 void process_input(void) {
@@ -58,6 +62,12 @@ void process_input(void) {
       break;
     case SDLK_4:
       render_method = RENDER_FILL_TRIANGLE_WIRE;
+      break;
+    case SDLK_5:
+      render_method = RENDER_TEXTURED;
+      break;
+    case SDLK_6:
+      render_method = RENDER_TEXTURED_WIRE;
       break;
     case SDLK_c:
       cull_method = CULL_BACKFACE;
@@ -214,6 +224,12 @@ void update(void) {
       projected_triangle.color =
           apply_light_intensity_factor(mesh_face.color, light_intensity_factor);
       projected_triangle.avg_depth = avg_depth;
+      projected_triangle.texcoords[0] =
+          (text2_t){mesh_face.a_uv.u, mesh_face.a_uv.v};
+      projected_triangle.texcoords[1] =
+          (text2_t){mesh_face.b_uv.u, mesh_face.b_uv.v};
+      projected_triangle.texcoords[2] =
+          (text2_t){mesh_face.c_uv.u, mesh_face.c_uv.v};
     }
 
     // Save the projected triangle in the array of triangles to render.
@@ -290,6 +306,11 @@ void render(void) {
                            triangle.points[2], triangle.color);
       draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
                     0xFFFFFF);
+      break;
+    case RENDER_TEXTURED:
+    case RENDER_TEXTURED_WIRE:
+      // TODO
+      // draw_textured_triangle(a, b, c, uva, uvb, uvc);
       break;
     }
   }

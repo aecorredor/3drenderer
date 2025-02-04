@@ -73,6 +73,12 @@ void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2,
   }
 }
 
+void draw_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
+  draw_line(p0, p1, color);
+  draw_line(p1, p2, color);
+  draw_line(p2, p0, color);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Draw a filled triangle with the flat-top/flat-bottom method
 // We split the original triangle in two, half flat-bottom and half flat-top
