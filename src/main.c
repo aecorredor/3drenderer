@@ -139,7 +139,7 @@ void update(void) {
   triangles_to_render = NULL;
 
   // Change the mesh scale/rotation values per animation frame.
-  // mesh.rotation.x += 0.005;
+  mesh.rotation.x += 0.005;
   // mesh.rotation.y += 0.005;
   // mesh.rotation.z += 0.005;
   // mesh.scale.x += 0.002;
@@ -309,8 +309,10 @@ void render(void) {
       break;
     case RENDER_TEXTURED:
     case RENDER_TEXTURED_WIRE:
-      // TODO
-      // draw_textured_triangle(a, b, c, uva, uvb, uvc);
+      draw_textured_triangle(triangle.points[0], triangle.points[1],
+                             triangle.points[2], triangle.texcoords[0],
+                             triangle.texcoords[1], triangle.texcoords[2],
+                             mesh_texture);
       break;
     }
   }
