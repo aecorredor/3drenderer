@@ -24,5 +24,7 @@ typedef struct {
 
 void draw_filled_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color);
 void draw_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color);
+void draw_textured_triangle(vec2_t p0, vec2_t p1, vec2_t p2, text2_t a_uv,
+                            text2_t b_uv, text2_t c_uv, uint32_t *texture);
 
 #endif

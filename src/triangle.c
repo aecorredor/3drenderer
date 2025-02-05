@@ -135,3 +135,10 @@ void draw_filled_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
   fill_flat_bot_triangle(p0.x, p0.y, p1.x, p1.y, m.x, m.y, color);
   fill_flat_top_triangle(p1.x, p1.y, m.x, m.y, p2.x, p2.y, color);
 }
+
+void draw_textured_triangle(vec2_t p0, vec2_t p1, vec2_t p2, text2_t a_uv,
+                            text2_t b_uv, text2_t c_uv, uint32_t *texture) {
+  // TODO:
+  // Loop all the pixels of the triangle and draw them based on the
+  // texel color that comes from the source texture array.
+}
