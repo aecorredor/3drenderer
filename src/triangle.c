@@ -1,6 +1,7 @@
 #include "triangle.h"
 #include "display.h"
 #include "texture.h"
+#include <math.h>
 
 void vec2_swap(vec2_t *a, vec2_t *b) {
   vec2_t temp = *a;
@@ -203,11 +204,11 @@ void draw_textured_triangle(vec2_t p0, vec2_t p1, vec2_t p2, text2_t p0_uv,
   float inv_slope_2 = 0;
 
   if (p1.y - p0.y != 0) {
-    inv_slope_1 = (float)(p1.x - p0.x) / (p1.y - p0.y);
+    inv_slope_1 = (p1.x - p0.x) / fabs(p1.y - p0.y);
   }
 
   if (p2.y - p0.y != 0) {
-    inv_slope_2 = (float)(p2.x - p0.x) / (p2.y - p0.y);
+    inv_slope_2 = (p2.x - p0.x) / fabs(p2.y - p0.y);
   }
 
   if (p1.y - p0.y != 0) {
