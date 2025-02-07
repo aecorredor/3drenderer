@@ -200,6 +200,7 @@ void draw_textured_triangle(vec2_t p0, vec2_t p1, vec2_t p2, text2_t p0_uv,
     text2_swap(&p0_uv, &p1_uv);
   }
 
+  // Render flat-bottom (top) triangle.
   float inv_slope_1 = 0;
   float inv_slope_2 = 0;
 
@@ -221,7 +222,34 @@ void draw_textured_triangle(vec2_t p0, vec2_t p1, vec2_t p2, text2_t p0_uv,
       }
 
       for (int x = x_start; x < x_end; x++) {
-        draw_pixel(x, y, 0xFFFF00FF);
+        draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF : 0xFF000000));
+      }
+    }
+  }
+
+  // Render flat-top (bottom) triangle.
+  inv_slope_1 = 0;
+  inv_slope_2 = 0;
+
+  if (p2.y - p1.y != 0) {
+    inv_slope_1 = (p2.x - p1.x) / fabs(p2.y - p1.y);
+  }
+
+  if (p2.y - p0.y != 0) {
+    inv_slope_2 = (p2.x - p0.x) / fabs(p2.y - p0.y);
+  }
+
+  if (p2.y - p1.y != 0) {
+    for (int y = p1.y; y <= p2.y; y++) {
+      int x_start = p1.x + (y - p1.y) * inv_slope_1;
+      int x_end = p0.x + (y - p0.y) * inv_slope_2;
+
+      if (x_end < x_start) {
+        int_swap(&x_end, &x_start);
+      }
+
+      for (int x = x_start; x < x_end; x++) {
+        draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF : 0xFF000000));
       }
     }
   }
