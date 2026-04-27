@@ -8,7 +8,6 @@
 #include "vector.h"
 #include <_types/_uint32_t.h>
 #include <stdio.h>
-
 bool is_running = false;
 
 vec3_t camera_position = {.x = 0, .y = 0, .z = 0};
@@ -21,7 +20,7 @@ int previous_frame_time = 0;
 void setup(void) {
   color_buffer =
       (uint32_t *)malloc(sizeof(uint32_t) * window_width * window_height);
-  color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+  color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32,
                                            SDL_TEXTUREACCESS_STREAMING,
                                            window_width, window_height);
 
@@ -33,9 +32,9 @@ void setup(void) {
   proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
   mesh_texture = (uint32_t *)REDBRICK_TEXTURE;
-
   // load_obj_file_data("./src/assets/f22.obj");
   load_cube_mesh();
+  // load_png_texture("./src/assets/cube.png");
 }
 
 void process_input(void) {
