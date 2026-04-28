@@ -20,7 +20,8 @@ int previous_frame_time = 0;
 void setup(void) {
   color_buffer =
       (uint32_t *)malloc(sizeof(uint32_t) * window_width * window_height);
-  color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32,
+  // TODO: use _RGBA32
+  color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32,
                                            SDL_TEXTUREACCESS_STREAMING,
                                            window_width, window_height);
 
@@ -140,7 +141,7 @@ void update(void) {
   // Change the mesh scale/rotation values per animation frame.
   mesh.rotation.x += 0.005;
   // mesh.rotation.y += 0.005;
-  // mesh.rotation.z += 0.005;
+  mesh.rotation.z += 0.005;
   // mesh.scale.x += 0.002;
   // mesh.scale.y += 0.001;
   // mesh.translation.x += 0.01;
@@ -312,6 +313,10 @@ void render(void) {
                              triangle.points[2], triangle.texcoords[0],
                              triangle.texcoords[1], triangle.texcoords[2],
                              mesh_texture);
+      if (render_method == RENDER_TEXTURED_WIRE) {
+        draw_triangle(triangle.points[0], triangle.points[1],
+                      triangle.points[2], 0xFFFFFF);
+      }
       break;
     }
   }

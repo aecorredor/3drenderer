@@ -121,12 +121,55 @@ void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2,
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Return the barycentric weights alpha, beta, and gamma for a point P
+///////////////////////////////////////////////////////////////////////////////
+//
+//              B
+//            / | \
+//           /  |  \
+//          /  (p)  \
+//         /  /   \  \
+//        / /      \  \
+//       A------------C
+///////////////////////////////////////////////////////////////////////////////
+vec3_t barycentric_coordinates(vec2_t a, vec2_t b, vec2_t c, vec2_t p) {
+  vec2_t ac = vec2_sub(c, a);
+  vec2_t ab = vec2_sub(b, a);
+  vec2_t ap = vec2_sub(p, a);
+  vec2_t pc = vec2_sub(c, p);
+  vec2_t pb = vec2_sub(b, p);
+
+  float parallelogram_abc_area = vec2_cross(ac, ab);
+  float alpha = vec2_cross(pc, pb) / parallelogram_abc_area;
+  float beta = vec2_cross(ac, ap) / parallelogram_abc_area;
+  float gamma = 1 - alpha - beta;
+
+  return (vec3_t){alpha, beta, gamma};
+}
+
 void draw_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
   draw_line(p0, p1, color);
   draw_line(p1, p2, color);
   draw_line(p2, p0, color);
 }
 
+void draw_texel(int x, int y, uint32_t *texture, vec2_t point_a, vec2_t point_b,
+                vec2_t point_c, float u0, float v0, float u1, float v1,
+                float u2, float v2) {
+  vec3_t weights = barycentric_coordinates(point_a, point_b, point_c,
+                                           (vec2_t){.x = x, .y = y});
+
+  float alpha = weights.x;
+  float beta = weights.y;
+  float gamma = weights.z;
+
+  float interpolated_u = alpha * u0 + beta * u1 + gamma * u2;
+  float interpolated_v = alpha * v0 + beta * v1 + gamma * v2;
+  int text_x = abs((int)(interpolated_u * texture_width));
+  int text_y = abs((int)(interpolated_v * texture_height));
+  draw_pixel(x, y, texture[texture_width * text_y + text_x]);
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Draw a filled triangle with the flat-top/flat-bottom method
 // We split the original triangle in two, half flat-bottom and half flat-top
@@ -222,7 +265,10 @@ void draw_textured_triangle(vec2_t p0, vec2_t p1, vec2_t p2, text2_t p0_uv,
       }
 
       for (int x = x_start; x < x_end; x++) {
-        draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF : 0xFF000000));
+        // draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF :
+        // 0xFF000000));
+        draw_texel(x, y, texture, p0, p1, p2, p0_uv.u, p0_uv.v, p1_uv.u,
+                   p1_uv.v, p2_uv.u, p2_uv.v);
       }
     }
   }
@@ -249,7 +295,10 @@ void draw_textured_triangle(vec2_t p0, vec2_t p1, vec2_t p2, text2_t p0_uv,
       }
 
       for (int x = x_start; x < x_end; x++) {
-        draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF : 0xFF000000));
+        // draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF :
+        // 0xFF000000));
+        draw_texel(x, y, texture, p0, p1, p2, p0_uv.u, p0_uv.v, p1_uv.u,
+                   p1_uv.v, p2_uv.u, p2_uv.v);
       }
     }
   }
