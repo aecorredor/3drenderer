@@ -161,8 +161,7 @@ void draw_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
 }
 
 void draw_texel(int x, int y, uint32_t *texture, vec4_t point_a, vec4_t point_b,
-                vec4_t point_c, float u0, float v0, float u1, float v1,
-                float u2, float v2) {
+                vec4_t point_c, text2_t uv_a, text2_t uv_b, text2_t uv_c) {
   vec2_t p = {.x = x, .y = y};
   vec2_t p0_2d = vec2_from_vec4(point_a);
   vec2_t p1_2d = vec2_from_vec4(point_b);
@@ -175,10 +174,12 @@ void draw_texel(int x, int y, uint32_t *texture, vec4_t point_a, vec4_t point_b,
 
   // Interpolated values for reciprocal of w to get linear interpolation for
   // perspective-correction.
-  float interpolated_u = alpha * (u0 / point_a.w) + beta * (u1 / point_b.w) +
-                         gamma * (u2 / point_c.w);
-  float interpolated_v = alpha * (v0 / point_a.w) + beta * (v1 / point_b.w) +
-                         gamma * (v2 / point_c.w);
+  float interpolated_u = alpha * (uv_a.u / point_a.w) +
+                         beta * (uv_b.u / point_b.w) +
+                         gamma * (uv_c.u / point_c.w);
+  float interpolated_v = alpha * (uv_a.v / point_a.w) +
+                         beta * (uv_b.v / point_b.w) +
+                         gamma * (uv_c.v / point_c.w);
   float interpolated_reciprocal_w = alpha * (1 / point_a.w) +
                                     beta * (1 / point_b.w) +
                                     gamma * (1 / point_c.w);
@@ -293,8 +294,7 @@ void draw_textured_triangle(vec4_t p0, vec4_t p1, vec4_t p2, text2_t p0_uv,
       for (int x = x_start; x < x_end; x++) {
         // draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF :
         // 0xFF000000));
-        draw_texel(x, y, texture, p0, p1, p2, p0_uv.u, p0_uv.v, p1_uv.u,
-                   p1_uv.v, p2_uv.u, p2_uv.v);
+        draw_texel(x, y, texture, p0, p1, p2, p0_uv, p1_uv, p2_uv);
       }
     }
   }
@@ -323,8 +323,7 @@ void draw_textured_triangle(vec4_t p0, vec4_t p1, vec4_t p2, text2_t p0_uv,
       for (int x = x_start; x < x_end; x++) {
         // draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF :
         // 0xFF000000));
-        draw_texel(x, y, texture, p0, p1, p2, p0_uv.u, p0_uv.v, p1_uv.u,
-                   p1_uv.v, p2_uv.u, p2_uv.v);
+        draw_texel(x, y, texture, p0, p1, p2, p0_uv, p1_uv, p2_uv);
       }
     }
   }
