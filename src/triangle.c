@@ -9,6 +9,12 @@ void vec2_swap(vec2_t *a, vec2_t *b) {
   *b = temp;
 }
 
+void vec4_swap(vec4_t *a, vec4_t *b) {
+  vec4_t temp = *a;
+  *a = *b;
+  *b = temp;
+}
+
 void text2_swap(text2_t *a, text2_t *b) {
   text2_t temp = *a;
   *a = *b;
@@ -154,20 +160,42 @@ void draw_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
   draw_line(p2, p0, color);
 }
 
-void draw_texel(int x, int y, uint32_t *texture, vec2_t point_a, vec2_t point_b,
-                vec2_t point_c, float u0, float v0, float u1, float v1,
+void draw_texel(int x, int y, uint32_t *texture, vec4_t point_a, vec4_t point_b,
+                vec4_t point_c, float u0, float v0, float u1, float v1,
                 float u2, float v2) {
-  vec3_t weights = barycentric_coordinates(point_a, point_b, point_c,
-                                           (vec2_t){.x = x, .y = y});
+  vec2_t p = {.x = x, .y = y};
+  vec2_t p0_2d = vec2_from_vec4(point_a);
+  vec2_t p1_2d = vec2_from_vec4(point_b);
+  vec2_t p2_2d = vec2_from_vec4(point_c);
+  vec3_t weights = barycentric_coordinates(p0_2d, p1_2d, p2_2d, p);
 
   float alpha = weights.x;
   float beta = weights.y;
   float gamma = weights.z;
 
-  float interpolated_u = alpha * u0 + beta * u1 + gamma * u2;
-  float interpolated_v = alpha * v0 + beta * v1 + gamma * v2;
+  // Interpolated values for reciprocal of w to get linear interpolation for
+  // perspective-correction.
+  // float interpolated_u = alpha * u0 + beta * u1 + gamma * u2;
+  // float interpolated_v = alpha * v0 + beta * v1 + gamma * v2;
+  float interpolated_u = alpha * (u0 / point_a.w) + beta * (u1 / point_b.w) +
+                         gamma * (u2 / point_c.w);
+  float interpolated_v = alpha * (v0 / point_a.w) + beta * (v1 / point_b.w) +
+                         gamma * (v2 / point_c.w);
+  float interpolated_reciprocal_w = alpha * (1 / point_a.w) +
+                                    beta * (1 / point_b.w) +
+                                    gamma * (1 / point_c.w);
+
+  // Now we can divide the interpolated u and v by the interpolated reciprocal w
+  // to get the perspective-corrected u and v. ACK: preferring readability over
+  // performance here; i.e. lots of divisions. Specifically, the recriprocal
+  // divisions for the triangle vertices could be lifted up (outside the loop),
+  // since they are constant for the triangle.
+  interpolated_u /= interpolated_reciprocal_w;
+  interpolated_v /= interpolated_reciprocal_w;
+
   int text_x = abs((int)(interpolated_u * texture_width));
   int text_y = abs((int)(interpolated_v * texture_height));
+
   draw_pixel(x, y, texture[texture_width * text_y + text_x]);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -225,21 +253,21 @@ void draw_filled_triangle(vec2_t p0, vec2_t p1, vec2_t p2, uint32_t color) {
   fill_flat_top_triangle(p1.x, p1.y, mx, my, p2.x, p2.y, color);
 }
 
-void draw_textured_triangle(vec2_t p0, vec2_t p1, vec2_t p2, text2_t p0_uv,
+void draw_textured_triangle(vec4_t p0, vec4_t p1, vec4_t p2, text2_t p0_uv,
                             text2_t p1_uv, text2_t p2_uv, uint32_t *texture) {
   // We need to sort vertices by ascending y-coordinate (y0 < y1 < y2)
   if (p0.y > p1.y) {
-    vec2_swap(&p0, &p1);
+    vec4_swap(&p0, &p1);
     text2_swap(&p0_uv, &p1_uv);
   }
 
   if (p1.y > p2.y) {
-    vec2_swap(&p1, &p2);
+    vec4_swap(&p1, &p2);
     text2_swap(&p1_uv, &p2_uv);
   }
 
   if (p0.y > p1.y) {
-    vec2_swap(&p0, &p1);
+    vec4_swap(&p0, &p1);
     text2_swap(&p0_uv, &p1_uv);
   }
 

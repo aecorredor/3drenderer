@@ -139,9 +139,9 @@ void update(void) {
   triangles_to_render = NULL;
 
   // Change the mesh scale/rotation values per animation frame.
-  mesh.rotation.x += 0.005;
-  // mesh.rotation.y += 0.005;
-  mesh.rotation.z += 0.005;
+  // mesh.rotation.x += 0.005;
+  mesh.rotation.y += 0.005;
+  // mesh.rotation.z += 0.005;
   // mesh.scale.x += 0.002;
   // mesh.scale.y += 0.001;
   // mesh.translation.x += 0.01;
@@ -203,9 +203,8 @@ void update(void) {
     float light_intensity_factor = -vec3_dot(normal, global_light.direction);
 
     for (int j = 0; j < 3; j++) {
-      vec2_t projected_point = vec2_from_vec4(
-          mat4_mul_vec4_project(proj_matrix, transformed_vertices[j]));
-
+      vec4_t projected_point =
+          mat4_mul_vec4_project(proj_matrix, transformed_vertices[j]);
       float width_factor = window_width / 2.0;
       float height_factor = window_height / 2.0;
 
@@ -283,29 +282,31 @@ void render(void) {
 
   for (int i = 0; i < mesh_face_count; i++) {
     triangle_t triangle = triangles_to_render[i];
+    vec2_t p0 = vec2_from_vec4(triangle.points[0]);
+    vec2_t p1 = vec2_from_vec4(triangle.points[1]);
+    vec2_t p2 = vec2_from_vec4(triangle.points[2]);
 
     switch (render_method) {
     case RENDER_WIRE_VERTEX:
       // Draw all vertices of the triangle.
-      draw_rect(triangle.points[0], 6, 6, 0xFF0000);
-      draw_rect(triangle.points[1], 6, 6, 0xFF0000);
-      draw_rect(triangle.points[2], 6, 6, 0xFF0000);
-      draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
-                    0xFFFFFF);
+      draw_rect(p0, 6, 6, 0xFF0000);
+      draw_rect(p1, 6, 6, 0xFF0000);
+      draw_rect(p2, 6, 6, 0xFF0000);
+      draw_triangle(p0, p1, p2, 0xFFFFFF);
       break;
     case RENDER_WIRE:
-      draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
-                    0xFFFFFF);
+      draw_triangle(p0, p1, p2, 0xFFFFFF);
       break;
     case RENDER_FILL_TRIANGLE:
-      draw_filled_triangle(triangle.points[0], triangle.points[1],
-                           triangle.points[2], triangle.color);
+      draw_filled_triangle(p0, p1, p2, triangle.color);
       break;
     case RENDER_FILL_TRIANGLE_WIRE:
-      draw_filled_triangle(triangle.points[0], triangle.points[1],
-                           triangle.points[2], triangle.color);
-      draw_triangle(triangle.points[0], triangle.points[1], triangle.points[2],
-                    0xFFFFFF);
+      draw_filled_triangle(vec2_from_vec4(triangle.points[0]),
+                           vec2_from_vec4(triangle.points[1]),
+                           vec2_from_vec4(triangle.points[2]), triangle.color);
+      draw_triangle(vec2_from_vec4(triangle.points[0]),
+                    vec2_from_vec4(triangle.points[1]),
+                    vec2_from_vec4(triangle.points[2]), 0xFFFFFF);
       break;
     case RENDER_TEXTURED:
     case RENDER_TEXTURED_WIRE:
@@ -314,8 +315,9 @@ void render(void) {
                              triangle.texcoords[1], triangle.texcoords[2],
                              mesh_texture);
       if (render_method == RENDER_TEXTURED_WIRE) {
-        draw_triangle(triangle.points[0], triangle.points[1],
-                      triangle.points[2], 0xFFFFFF);
+        draw_triangle(vec2_from_vec4(triangle.points[0]),
+                      vec2_from_vec4(triangle.points[1]),
+                      vec2_from_vec4(triangle.points[2]), 0xFFFFFF);
       }
       break;
     }
