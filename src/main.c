@@ -5,6 +5,7 @@
 #include "mesh.h"
 #include "texture.h"
 #include "triangle.h"
+#include "upng.h"
 #include "vector.h"
 #include <_types/_uint32_t.h>
 #include <stdio.h>
@@ -20,8 +21,7 @@ int previous_frame_time = 0;
 void setup(void) {
   color_buffer =
       (uint32_t *)malloc(sizeof(uint32_t) * window_width * window_height);
-  // TODO: use _RGBA32
-  color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32,
+  color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32,
                                            SDL_TEXTUREACCESS_STREAMING,
                                            window_width, window_height);
 
@@ -32,10 +32,10 @@ void setup(void) {
   float zfar = 100.0;
   proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
-  mesh_texture = (uint32_t *)REDBRICK_TEXTURE;
+  // mesh_texture = (uint32_t *)REDBRICK_TEXTURE;
   // load_obj_file_data("./src/assets/f22.obj");
   load_cube_mesh();
-  // load_png_texture("./src/assets/cube.png");
+  load_png_texture("./src/assets/cube.png");
 }
 
 void process_input(void) {
