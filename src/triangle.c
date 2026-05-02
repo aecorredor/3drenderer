@@ -175,8 +175,6 @@ void draw_texel(int x, int y, uint32_t *texture, vec4_t point_a, vec4_t point_b,
 
   // Interpolated values for reciprocal of w to get linear interpolation for
   // perspective-correction.
-  // float interpolated_u = alpha * u0 + beta * u1 + gamma * u2;
-  // float interpolated_v = alpha * v0 + beta * v1 + gamma * v2;
   float interpolated_u = alpha * (u0 / point_a.w) + beta * (u1 / point_b.w) +
                          gamma * (u2 / point_c.w);
   float interpolated_v = alpha * (v0 / point_a.w) + beta * (v1 / point_b.w) +
