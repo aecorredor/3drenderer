@@ -33,9 +33,9 @@ void setup(void) {
   proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
   // mesh_texture = (uint32_t *)REDBRICK_TEXTURE;
-  load_obj_file_data("./src/assets/cube.obj");
+  load_obj_file_data("./src/assets/f22.obj");
   // load_cube_mesh();
-  load_png_texture("./src/assets/cube.png");
+  load_png_texture("./src/assets/f22.png");
 }
 
 void process_input(void) {
@@ -139,7 +139,7 @@ void update(void) {
   triangles_to_render = NULL;
 
   // Change the mesh scale/rotation values per animation frame.
-  // mesh.rotation.x += 0.005;
+  mesh.rotation.x += 0.005;
   mesh.rotation.y += 0.005;
   // mesh.rotation.z += 0.005;
   // mesh.scale.x += 0.002;
