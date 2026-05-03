@@ -124,12 +124,21 @@ void load_obj_file_data(char *filename) {
   file = fopen(filename, "r");
   char line[1024];
 
+  text2_t *uv_coords = NULL;
+
   while (fgets(line, 1024, file)) {
     // Vertex info
     if (strncmp(line, "v ", 2) == 0) {
       vec3_t vertex;
       sscanf(line, "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
       array_push(mesh.vertices, vertex);
+    }
+
+    // Texture info
+    if (strncmp(line, "vt ", 3) == 0) {
+      text2_t uv;
+      sscanf(line, "vt %f %f", &uv.u, &uv.v);
+      array_push(uv_coords, uv);
     }
 
     // Face info
@@ -143,11 +152,17 @@ void load_obj_file_data(char *filename) {
              &texture_indices[1], &normal_indices[1], &vertex_indices[2],
              &texture_indices[2], &normal_indices[2]);
 
-      face_t face = {.a = vertex_indices[0],
-                     .b = vertex_indices[1],
-                     .c = vertex_indices[2],
+      face_t face = {.a = vertex_indices[0] - 1,
+                     .b = vertex_indices[1] - 1,
+                     .c = vertex_indices[2] - 1,
+                     // OBJ files use 1-based indexing for texture coordinates,
+                     // so we need to subtract 1 to get the correct index.
+                     .a_uv = uv_coords[texture_indices[0] - 1],
+                     .b_uv = uv_coords[texture_indices[1] - 1],
+                     .c_uv = uv_coords[texture_indices[2] - 1],
                      .color = 0xFFFFFF};
       array_push(mesh.faces, face);
     }
   }
+  array_free(uv_coords);
 }

@@ -270,6 +270,10 @@ void draw_textured_triangle(vec4_t p0, vec4_t p1, vec4_t p2, text2_t p0_uv,
     text2_swap(&p0_uv, &p1_uv);
   }
 
+  p0_uv.v = 1.0 - p0_uv.v;
+  p1_uv.v = 1.0 - p1_uv.v;
+  p2_uv.v = 1.0 - p2_uv.v;
+
   // Render flat-bottom (top) triangle.
   float inv_slope_1 = 0;
   float inv_slope_2 = 0;
@@ -292,8 +296,6 @@ void draw_textured_triangle(vec4_t p0, vec4_t p1, vec4_t p2, text2_t p0_uv,
       }
 
       for (int x = x_start; x < x_end; x++) {
-        // draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF :
-        // 0xFF000000));
         draw_texel(x, y, texture, p0, p1, p2, p0_uv, p1_uv, p2_uv);
       }
     }

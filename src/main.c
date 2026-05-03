@@ -33,8 +33,8 @@ void setup(void) {
   proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
   // mesh_texture = (uint32_t *)REDBRICK_TEXTURE;
-  // load_obj_file_data("./src/assets/f22.obj");
-  load_cube_mesh();
+  load_obj_file_data("./src/assets/cube.obj");
+  // load_cube_mesh();
   load_png_texture("./src/assets/cube.png");
 }
 
@@ -152,9 +152,9 @@ void update(void) {
   for (int i = 0; i < array_length(mesh.faces); i++) {
     face_t mesh_face = mesh.faces[i];
     vec3_t face_vertices[3];
-    face_vertices[0] = mesh.vertices[mesh_face.a - 1];
-    face_vertices[1] = mesh.vertices[mesh_face.b - 1];
-    face_vertices[2] = mesh.vertices[mesh_face.c - 1];
+    face_vertices[0] = mesh.vertices[mesh_face.a];
+    face_vertices[1] = mesh.vertices[mesh_face.b];
+    face_vertices[2] = mesh.vertices[mesh_face.c];
 
     triangle_t projected_triangle;
 
