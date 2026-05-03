@@ -192,8 +192,13 @@ void draw_texel(int x, int y, uint32_t *texture, vec4_t point_a, vec4_t point_b,
   interpolated_u /= interpolated_reciprocal_w;
   interpolated_v /= interpolated_reciprocal_w;
 
-  int text_x = abs((int)(interpolated_u * texture_width));
-  int text_y = abs((int)(interpolated_v * texture_height));
+  // We take the modulo of the texture width and height to ensure that the
+  // text_x and text_y are within the texture bounds; i.e. we're dealing with a
+  // discrete raster of a triangle, but went with integer values for the
+  // vertices, so we could definitely end up with a pixel point that's outside
+  // of our perfect triangle raster.
+  int text_x = abs((int)(interpolated_u * texture_width)) % texture_width;
+  int text_y = abs((int)(interpolated_v * texture_height)) % texture_height;
 
   draw_pixel(x, y, texture[texture_width * text_y + text_x]);
 }
