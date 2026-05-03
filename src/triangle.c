@@ -279,22 +279,30 @@ void draw_textured_triangle(vec4_t p0, vec4_t p1, vec4_t p2, text2_t p0_uv,
   p1_uv.v = 1.0 - p1_uv.v;
   p2_uv.v = 1.0 - p2_uv.v;
 
+  // Snap y to int so scanline bounds align with the slope denominators.
+  // Without this, fractional vertex y values cause the integer loop range
+  // to fall outside the triangle, and the back-extrapolated x_start/x_end
+  // produce long horizontal streaks of texture sampling.
+  int y0 = (int)p0.y;
+  int y1 = (int)p1.y;
+  int y2 = (int)p2.y;
+
   // Render flat-bottom (top) triangle.
   float inv_slope_1 = 0;
   float inv_slope_2 = 0;
 
-  if (p1.y - p0.y != 0) {
-    inv_slope_1 = (p1.x - p0.x) / fabs(p1.y - p0.y);
+  if (y1 - y0 != 0) {
+    inv_slope_1 = (p1.x - p0.x) / (float)abs(y1 - y0);
   }
 
-  if (p2.y - p0.y != 0) {
-    inv_slope_2 = (p2.x - p0.x) / fabs(p2.y - p0.y);
+  if (y2 - y0 != 0) {
+    inv_slope_2 = (p2.x - p0.x) / (float)abs(y2 - y0);
   }
 
-  if (p1.y - p0.y != 0) {
-    for (int y = p0.y; y <= p1.y; y++) {
-      int x_start = p1.x + (y - p1.y) * inv_slope_1;
-      int x_end = p0.x + (y - p0.y) * inv_slope_2;
+  if (y1 - y0 != 0) {
+    for (int y = y0; y <= y1; y++) {
+      int x_start = p1.x + (y - y1) * inv_slope_1;
+      int x_end = p0.x + (y - y0) * inv_slope_2;
 
       if (x_end < x_start) {
         int_swap(&x_end, &x_start);
@@ -310,26 +318,24 @@ void draw_textured_triangle(vec4_t p0, vec4_t p1, vec4_t p2, text2_t p0_uv,
   inv_slope_1 = 0;
   inv_slope_2 = 0;
 
-  if (p2.y - p1.y != 0) {
-    inv_slope_1 = (p2.x - p1.x) / fabs(p2.y - p1.y);
+  if (y2 - y1 != 0) {
+    inv_slope_1 = (p2.x - p1.x) / (float)abs(y2 - y1);
   }
 
-  if (p2.y - p0.y != 0) {
-    inv_slope_2 = (p2.x - p0.x) / fabs(p2.y - p0.y);
+  if (y2 - y0 != 0) {
+    inv_slope_2 = (p2.x - p0.x) / (float)abs(y2 - y0);
   }
 
-  if (p2.y - p1.y != 0) {
-    for (int y = p1.y; y <= p2.y; y++) {
-      int x_start = p1.x + (y - p1.y) * inv_slope_1;
-      int x_end = p0.x + (y - p0.y) * inv_slope_2;
+  if (y2 - y1 != 0) {
+    for (int y = y1; y <= y2; y++) {
+      int x_start = p1.x + (y - y1) * inv_slope_1;
+      int x_end = p0.x + (y - y0) * inv_slope_2;
 
       if (x_end < x_start) {
         int_swap(&x_end, &x_start);
       }
 
       for (int x = x_start; x < x_end; x++) {
-        // draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0 ? 0xFFFF00FF :
-        // 0xFF000000));
         draw_texel(x, y, texture, p0, p1, p2, p0_uv, p1_uv, p2_uv);
       }
     }
